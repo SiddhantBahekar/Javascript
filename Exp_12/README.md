@@ -1,6 +1,4 @@
-# Symbiosis Institute of Technology
-## Department of Computer Science and Engineering
-### Semester 5 — JavaScript Lab (VAC)
+
 #### Experiment 12: Interactive Real-Time Web Application using JavaScript and jQuery with DOM, Events, Storage, and AJAX Integration
 
 ---
