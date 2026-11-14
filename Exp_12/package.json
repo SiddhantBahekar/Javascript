@@ -1,0 +1,21 @@
+{
+  "name": "experiment-12-vac-realtime-webapp",
+  "version": "1.0.0",
+  "description": "Experiment 12 (VAC) - Real-Time Financial & Crypto Dashboard with JavaScript, jQuery, DOM, Events, Storage, and AJAX.",
+  "scripts": {
+    "start": "python -m http.server 3000",
+    "serve:node": "npx serve -l 3000 ."
+  },
+  "keywords": [
+    "javascript",
+    "jquery",
+    "dom-manipulation",
+    "event-handling",
+    "localstorage",
+    "sessionstorage",
+    "ajax",
+    "real-time"
+  ],
+  "author": "Symbiosis Institute of Technology - SEM 5 JS Lab",
+  "license": "MIT"
+}

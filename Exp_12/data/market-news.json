@@ -1,0 +1,42 @@
+[
+  {
+    "id": "news-1",
+    "title": "Institutional Crypto Inflows Reach $2.2B in Weekly Surge",
+    "source": "CryptoWire Global",
+    "time": "12m ago",
+    "sentiment": "bullish",
+    "summary": "Asset managers saw a surge in crypto ETP inflows driven by spot fund volume and sustained macroeconomic liquidity."
+  },
+  {
+    "id": "news-2",
+    "title": "Decentralized Layer-2 Networks Process Record Daily Transactions",
+    "source": "DeFi Analytics",
+    "time": "34m ago",
+    "sentiment": "bullish",
+    "summary": "Gas fees plummet across major rollups as throughput scales beyond 4,000 transactions per second network-wide."
+  },
+  {
+    "id": "news-3",
+    "title": "Federal Reserve Holds Rates Steady, Citing Balanced Inflation Metrics",
+    "source": "Macro Economic Review",
+    "time": "1h ago",
+    "sentiment": "neutral",
+    "summary": "Central bank signals patience while markets evaluate the yield curve across digital and traditional sovereign bonds."
+  },
+  {
+    "id": "news-4",
+    "title": "Cross-Chain Interoperability Standard Approved by Consortium",
+    "source": "Blockchain Standards",
+    "time": "2h ago",
+    "sentiment": "bullish",
+    "summary": "Unified messaging primitives aim to eliminate bridge exploits and streamline multi-chain liquidity routing."
+  },
+  {
+    "id": "news-5",
+    "title": "Regulatory Clarity Emerging for Digital Asset Custodians in Asia-Pacific",
+    "source": "Fintech Policy Forum",
+    "time": "3h ago",
+    "sentiment": "neutral",
+    "summary": "Financial regulators in Singapore and Tokyo publish unified compliance frameworks for licensed trading venues."
+  }
+]

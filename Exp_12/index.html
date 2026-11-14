@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="NexusTrade Pro - Real-Time Financial & Crypto Dashboard using JavaScript and jQuery featuring DOM manipulation, Event delegation, Web Storage, and AJAX integration.">
+  <title>NexusTrade Pro | Real-Time Financial & Crypto Intelligence Hub</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body class="theme-dark">
+
+  <!-- Top Real-Time Live Ticker Marquee -->
+  <aside class="ticker-banner" aria-label="Real-time price ticker">
+    <div class="ticker-track" id="ticker-track">
+      <div class="ticker-item"><span class="ticker-symbol">CONNECTING...</span></div>
+    </div>
+  </aside>
+
+  <!-- Application Main Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand-section">
+        <div class="brand-logo" aria-hidden="true">⚡</div>
+        <div>
+          <h1 class="brand-title">NexusTrade <span class="brand-tag">PRO</span></h1>
+          <p class="brand-subtitle">Real-Time Asset Intelligence & Paper Trading Simulator</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <!-- Live AJAX Telemetry Badge -->
+        <div id="network-status-pill" class="status-pill status-simulated">
+          <span class="status-dot"></span>
+          <span id="sync-status-indicator" class="status-text">Connecting...</span>
+        </div>
+
+        <!-- Polling Countdown -->
+        <span id="sync-countdown-badge" class="countdown-badge">Next sync: --</span>
+
+        <!-- Manual AJAX Refresh -->
+        <button id="btn-manual-refresh" class="btn btn-secondary btn-sm" title="Trigger AJAX Sync Now (Keyboard: R)">
+          <span id="refresh-spinner" class="spinner">🔄</span>
+          <span class="btn-text">Refresh</span>
+        </button>
+
+        <!-- View Toggle (Table vs Cards) -->
+        <button id="btn-toggle-view" class="btn btn-outline btn-sm" title="Toggle Table / Cards View">
+          📊 <span class="btn-text">Cards View</span>
+        </button>
+
+        <!-- Theme Toggle (Dark / Light) -->
+        <button id="btn-toggle-theme" class="btn btn-outline btn-sm" title="Toggle Dark/Light Theme (Keyboard: D)">
+          ☀️ <span class="btn-text">Light Mode</span>
+        </button>
+
+        <!-- Settings Modal Trigger -->
+        <button id="btn-open-settings" class="btn btn-outline btn-sm" title="Open Settings & Data Manager">
+          ⚙️ <span class="btn-text">Settings</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Sub-Navigation Bar: Tabs, Search & Filters -->
+  <nav class="subnav-bar">
+    <div class="subnav-container">
+      <div class="nav-tabs-group" role="tablist">
+        <button class="nav-tab-btn active" data-tab="market" role="tab" aria-selected="true">
+          🌐 Market Overview
+        </button>
+        <button class="nav-tab-btn" data-tab="watchlist" role="tab" aria-selected="false">
+          ⭐ Watchlist <span id="badge-watchlist-count" class="tab-badge">0</span>
+        </button>
+        <button class="nav-tab-btn" data-tab="portfolio" role="tab" aria-selected="false">
+          💼 Paper Portfolio
+        </button>
+        <button class="nav-tab-btn" data-tab="analytics" role="tab" aria-selected="false">
+          📈 Intelligence & Telemetry
+        </button>
+        <button class="nav-tab-btn" data-tab="logs" role="tab" aria-selected="false">
+          📜 Activity Log
+        </button>
+      </div>
+
+      <!-- Real-Time Search Box with Debounce -->
+      <div class="search-wrapper">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search-input" class="search-input" placeholder="Search by asset name or symbol..." autocomplete="off">
+        <kbd class="search-shortcut-hint" title="Press / on your keyboard to focus search">/</kbd>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Application Body -->
+  <main class="main-content">
+    
+    <!-- Top Summary Stat Cards -->
+    <section class="stats-overview-grid" aria-label="Portfolio & Market Summary">
+      <div class="stat-card">
+        <span class="stat-label">Paper Portfolio Net Worth</span>
+        <span class="stat-value" id="portfolio-net-worth">$100,000.00</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Total Unrealized P&L</span>
+        <div id="portfolio-pnl" class="stat-value font-mono">
+          <span class="text-success">+$0.00</span> <span class="badge badge-success">+0.00%</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Available Cash Balance</span>
+        <span class="stat-value" id="portfolio-cash-balance">$100,000.00</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Holdings Valuation</span>
+        <span class="stat-value" id="portfolio-holdings-value">$0.00</span>
+      </div>
+    </section>
+
+    <!-- Tab Panel 1: Market Overview -->
+    <section id="tab-panel-market" class="tab-content-panel active">
+      <!-- Table View -->
+      <div id="market-table-container" class="table-responsive">
+        <table class="market-table" id="market-table">
+          <thead>
+            <tr>
+              <th style="width: 40px;"></th>
+              <th class="sortable" data-sort="rank" style="width: 60px;">#</th>
+              <th class="sortable" data-sort="name">Asset</th>
+              <th class="sortable" data-sort="priceUsd">Price</th>
+              <th class="sortable" data-sort="changePercent24Hr">24h Change</th>
+              <th>24h Trend (Sparkline)</th>
+              <th class="sortable" data-sort="marketCapUsd">Market Cap</th>
+              <th style="text-align: right;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="market-table-body">
+            <tr>
+              <td colspan="8" style="text-align: center; padding: 40px;" class="text-muted">
+                <span class="spinner spin">🔄</span> Loading real-time market data via AJAX...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Cards Grid View (Toggled via button) -->
+      <div id="market-cards-container" style="display: none;">
+        <div class="cards-grid" id="market-cards-grid">
+          <!-- Dynamically Injected Cards -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab Panel 2: Watchlist -->
+    <section id="tab-panel-watchlist" class="tab-content-panel">
+      <div id="watchlist-table-container" class="table-responsive">
+        <table class="market-table">
+          <thead>
+            <tr>
+              <th style="width: 40px;"></th>
+              <th class="sortable" data-sort="rank" style="width: 60px;">#</th>
+              <th class="sortable" data-sort="name">Asset</th>
+              <th class="sortable" data-sort="priceUsd">Price</th>
+              <th class="sortable" data-sort="changePercent24Hr">24h Change</th>
+              <th>24h Trend (Sparkline)</th>
+              <th class="sortable" data-sort="marketCapUsd">Market Cap</th>
+              <th style="text-align: right;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="watchlist-table-body">
+            <!-- Dynamically populated -->
+          </tbody>
+        </table>
+      </div>
+      <div id="watchlist-cards-container" style="display: none;">
+        <div class="cards-grid" id="watchlist-cards-grid">
+          <!-- Dynamically populated cards -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab Panel 3: Portfolio Holdings -->
+    <section id="tab-panel-portfolio" class="tab-content-panel">
+      <div class="panel-card mb-6">
+        <div class="panel-header">
+          <h2 class="panel-title">Active Positions & Paper Assets</h2>
+          <span class="text-xs text-muted">Real-time mark-to-market valuation</span>
+        </div>
+        <div class="table-responsive">
+          <table class="market-table">
+            <thead>
+              <tr>
+                <th>Holding</th>
+                <th>Quantity</th>
+                <th>Avg Buy Price</th>
+                <th>Current Price</th>
+                <th>Current Value</th>
+                <th>Unrealized P&L</th>
+                <th style="text-align: right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="holdings-table-body">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab Panel 4: Analytics & News Intelligence -->
+    <section id="tab-panel-analytics" class="tab-content-panel">
+      <div class="analytics-dashboard-grid">
+        <!-- Real-Time AJAX News Dispatches -->
+        <div class="panel-card">
+          <div class="panel-header">
+            <h2 class="panel-title">📡 Real-Time Market Intelligence Dispatches</h2>
+            <span class="badge badge-secondary text-xs">AJAX Live Feed</span>
+          </div>
+          <div class="news-feed-list" id="news-feed-list">
+            <div class="text-muted p-4">Fetching intelligence feed...</div>
+          </div>
+        </div>
+
+        <!-- Telemetry & Laboratory Controls -->
+        <div class="panel-card">
+          <div class="panel-header">
+            <h2 class="panel-title">🔬 Lab Telemetry & Diagnostics</h2>
+            <span class="lab-meta-tag">Exp-12 Verification</span>
+          </div>
+          <ul class="telemetry-list">
+            <li class="telemetry-row">
+              <span class="text-muted">Total AJAX Requests (Session):</span>
+              <strong id="metric-api-calls" class="font-mono">0</strong>
+            </li>
+            <li class="telemetry-row">
+              <span class="text-muted">Orders Executed:</span>
+              <strong id="metric-trades" class="font-mono">0</strong>
+            </li>
+            <li class="telemetry-row">
+              <span class="text-muted">Network Latency (Round-trip):</span>
+              <strong id="metric-latency" class="font-mono">-- ms</strong>
+            </li>
+            <li class="telemetry-row">
+              <span class="text-muted">Session Started At:</span>
+              <span id="metric-session-start" class="font-mono text-xs">--</span>
+            </li>
+            <li class="telemetry-row">
+              <span class="text-muted">Web Storage Engine:</span>
+              <span class="badge badge-success text-xs">localStorage & sessionStorage</span>
+            </li>
+          </ul>
+
+          <div style="margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--border-color);">
+            <label class="form-check" title="Toggle simulated network error to verify AJAX error recovery and user alerts.">
+              <input type="checkbox" id="chk-simulate-error">
+              <span><strong>Simulate Network Error (Lab Test)</strong></span>
+            </label>
+            <p class="text-xs text-muted" style="margin-top: 6px;">
+              Enables testing the AJAX <code>error</code> lifecycle callback and graceful fallback without disconnecting from the internet.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab Panel 5: Activity Log -->
+    <section id="tab-panel-logs" class="tab-content-panel">
+      <div class="panel-card">
+        <div class="panel-header">
+          <h2 class="panel-title">📜 Order Execution & Transaction History</h2>
+          <span class="text-xs text-muted">Persisted in localStorage</span>
+        </div>
+        <div class="table-responsive">
+          <table class="market-table">
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Type</th>
+                <th>Asset</th>
+                <th>Quantity</th>
+                <th>Execution Price</th>
+                <th>Total Value</th>
+                <th>Realized P&L</th>
+              </tr>
+            </thead>
+            <tbody id="transactions-table-body">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Modal 1: Place Trade Order Dialog -->
+  <div class="modal-overlay" id="modal-trade" role="dialog" aria-modal="true" aria-labelledby="trade-dialog-title">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title" id="trade-dialog-title">Execute Order</h3>
+        <button class="modal-close" aria-label="Close modal">&times;</button>
+      </div>
+      <form id="form-trade">
+        <div class="modal-body">
+          <input type="hidden" id="trade-modal-asset-id">
+          <input type="hidden" id="trade-modal-symbol">
+          <input type="hidden" id="trade-modal-price">
+          <input type="hidden" id="trade-action-type" value="BUY">
+
+          <div class="trade-type-switcher">
+            <div class="trade-type-tab active" data-type="BUY">BUY</div>
+            <div class="trade-type-tab" data-type="SELL">SELL</div>
+          </div>
+
+          <div class="form-group">
+            <div class="flex justify-between text-xs text-muted">
+              <span>Current Market Price</span>
+              <span id="trade-current-price-display" class="font-mono font-bold">$0.00</span>
+            </div>
+            <div class="flex justify-between text-xs text-muted mt-1">
+              <span>Available Cash: <strong id="trade-available-cash" class="font-mono">$0.00</strong></span>
+              <span>Position Owned: <strong id="trade-owned-qty" class="font-mono">0</strong></span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="trade-quantity">Order Quantity</label>
+            <div class="input-with-button">
+              <input type="number" id="trade-quantity" class="form-control font-mono" step="any" min="0.0001" placeholder="Enter amount" required>
+              <button type="button" id="btn-trade-max" class="btn btn-secondary btn-sm">MAX</button>
+            </div>
+          </div>
+
+          <div class="stat-card" style="background: rgba(0, 0, 0, 0.2);">
+            <div style="display: flex; justify-content: space-between; align-items: baseline;">
+              <span class="text-xs text-muted">Estimated Total Cost / Proceeds</span>
+              <span id="trade-estimated-total" class="font-mono font-bold text-lg">$0.00</span>
+            </div>
+            <div id="trade-balance-hint" class="text-xs text-muted mt-1">
+              <!-- Dynamic hint based on cash or holdings -->
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline btn-modal-cancel">Cancel</button>
+          <button type="submit" id="btn-submit-trade" class="btn btn-primary">Confirm Order</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 2: Asset Details Inspection Dialog -->
+  <div class="modal-overlay" id="modal-details" role="dialog" aria-modal="true" aria-labelledby="detail-title">
+    <div class="modal-dialog" style="max-width: 580px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="detail-title">Asset Specification</h3>
+        <button class="modal-close" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="display: flex; justify-content: space-between; align-items: baseline;">
+          <div>
+            <span id="detail-rank" class="badge badge-secondary">#--</span>
+            <span id="detail-price" class="font-mono font-bold text-xl ml-2">$0.00</span>
+          </div>
+          <div id="detail-change">--</div>
+        </div>
+
+        <div id="detail-chart-container" style="background: rgba(0,0,0,0.15); border-radius: var(--radius-sm); padding: 12px; display: flex; justify-content: center;">
+          <!-- High-res SVG Sparkline -->
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 0.85rem;">
+          <div class="stat-card">
+            <span class="text-muted text-xs">24h High</span>
+            <strong id="detail-high" class="font-mono">$0.00</strong>
+          </div>
+          <div class="stat-card">
+            <span class="text-muted text-xs">24h Low</span>
+            <strong id="detail-low" class="font-mono">$0.00</strong>
+          </div>
+          <div class="stat-card">
+            <span class="text-muted text-xs">Market Capitalization</span>
+            <strong id="detail-mcap" class="font-mono">$0.00</strong>
+          </div>
+          <div class="stat-card">
+            <span class="text-muted text-xs">24h Trading Volume</span>
+            <strong id="detail-volume" class="font-mono">$0.00</strong>
+          </div>
+        </div>
+
+        <div class="text-xs text-muted flex justify-between">
+          <span>Quote Timestamp: <strong id="detail-last-updated">--</strong></span>
+          <span>Source: Public API / Live Feed</span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline btn-modal-cancel">Close</button>
+        <button type="button" id="btn-detail-trade-trigger" class="btn btn-primary">Trade This Asset</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 3: Settings & Data Management Dialog -->
+  <div class="modal-overlay" id="modal-settings" role="dialog" aria-modal="true" aria-labelledby="settings-dialog-title">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title" id="settings-dialog-title">Preferences & Storage Manager</h3>
+        <button class="modal-close" aria-label="Close modal">&times;</button>
+      </div>
+      <form id="form-settings">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="setting-currency">Display Currency</label>
+            <select id="setting-currency" class="form-control">
+              <option value="USD">USD ($) - US Dollar</option>
+              <option value="EUR">EUR (€) - Euro</option>
+              <option value="INR">INR (₹) - Indian Rupee</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="setting-refresh-rate">Real-Time Polling Rate</label>
+            <select id="setting-refresh-rate" class="form-control">
+              <option value="3000">High-Frequency (3 Seconds)</option>
+              <option value="6000" selected>Standard Live (6 Seconds)</option>
+              <option value="12000">Relaxed (12 Seconds)</option>
+              <option value="30000">Battery Saver (30 Seconds)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-check">
+              <input type="checkbox" id="setting-auto-refresh" checked>
+              <span>Enable Real-Time Background Polling (AJAX)</span>
+            </label>
+          </div>
+
+          <div class="form-group">
+            <label class="form-check">
+              <input type="checkbox" id="setting-sim-mode">
+              <span>Force Local Simulation Engine (Offline mode)</span>
+            </label>
+          </div>
+
+          <div class="form-group">
+            <label class="form-check">
+              <input type="checkbox" id="setting-sim-latency">
+              <span>Emulate Realistic Network Latency (~450ms)</span>
+            </label>
+          </div>
+
+          <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 6px 0;">
+
+          <div class="form-group">
+            <label class="form-label">Data Persistence Management (Web Storage API)</label>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <button type="button" id="btn-export-data" class="btn btn-secondary btn-sm">
+                💾 Export JSON Backup
+              </button>
+              <button type="button" id="btn-import-trigger" class="btn btn-secondary btn-sm">
+                📥 Import Backup JSON
+              </button>
+              <input type="file" id="import-file-input" accept=".json" style="display: none;">
+              <button type="button" id="btn-reset-defaults" class="btn btn-danger btn-sm">
+                🔄 Reset to Defaults
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline btn-modal-cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Settings</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Dynamic Toast Notifications Container -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <!-- Laboratory Footer -->
+  <footer class="app-footer">
+    <div class="footer-container">
+      <div>
+        <strong>NexusTrade Pro</strong> — Full Stack Client-Side Architecture
+      </div>
+      <div>
+        <span class="lab-meta-tag">Experiment 12 (VAC)</span>
+        <span class="lab-meta-tag">JavaScript + jQuery</span>
+        <span class="lab-meta-tag">DOM • Events • Storage • AJAX</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts: Vendor jQuery (Local bundle with CDN fallback) -->
+  <script src="js/vendor/jquery.min.js"></script>
+  <script>
+    if (typeof jQuery === 'undefined') {
+      document.write('<script src="https://code.jquery.com/jquery-3.7.1.min.js"><\/script>');
+    }
+  </script>
+
+  <!-- Modular Application Logic -->
+  <script src="js/modules/storage.js"></script>
+  <script src="js/modules/ajax-api.js"></script>
+  <script src="js/modules/portfolio.js"></script>
+  <script src="js/modules/ui.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
