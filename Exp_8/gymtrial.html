@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Gym Admission Form</title>
+</head>
+
+<body>
+
+    <h2>Gym Admission Form</h2>
+
+    <form id="gymForm">
+
+        Name:
+        <input type="text" id="name">
+        <small id="nameError"></small>
+        <br><br>
+
+        Email:
+        <input type="email" id="email">
+        <small id="emailError"></small>
+        <br><br>
+
+        Age:
+        <input type="number" id="age">
+        <small id="ageError"></small>
+        <br><br>
+
+        Membership Plan:
+        <select id="plan">
+            <option value="">Select Plan</option>
+            <option>Monthly</option>
+            <option>Quarterly</option>
+            <option>Yearly</option>
+        </select>
+        <small id="planError"></small>
+        <br><br>
+
+        <button type="submit">Submit</button>
+
+    </form>
+
+    <p id="success"></p>
+
+    <script>
+
+        // Input and blur events
+        document.getElementById("name")
+            .addEventListener("input", validateName);
+
+        document.getElementById("email")
+            .addEventListener("input", validateEmail);
+
+        document.getElementById("age")
+            .addEventListener("blur", validateAge);
+
+        // Validate name
+        function validateName() {
+            let name = document.getElementById("name").value.trim();
+
+            document.getElementById("nameError").textContent =
+                name.length < 3 ? "Minimum 3 characters required." : "";
+        }
+
+        // Validate email
+        function validateEmail() {
+            let email = document.getElementById("email").value;
+
+            let pattern =
+                /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+
+            document.getElementById("emailError").textContent =
+                pattern.test(email) ? "" : "Enter a valid email.";
+        }
+
+        // Validate age
+        function validateAge() {
+            let age = Number(document.getElementById("age").value);
+
+            document.getElementById("ageError").textContent =
+                (age < 16 || age > 60) ?
+                    "Age must be between 16 and 60." : "";
+        }
+
+        // Form submit event
+        document.getElementById("gymForm")
+            .addEventListener("submit", function (e) {
+
+                e.preventDefault();
+
+                validateName();
+                validateEmail();
+                validateAge();
+
+                let plan = document.getElementById("plan").value;
+
+                document.getElementById("planError").textContent =
+                    plan === "" ? "Please select a plan." : "";
+
+                if (
+                    document.getElementById("nameError").textContent === "" &&
+                    document.getElementById("emailError").textContent === "" &&
+                    document.getElementById("ageError").textContent === "" &&
+                    document.getElementById("planError").textContent === ""
+                ) {
+                    document.getElementById("success").textContent =
+                        "Form Submitted Successfully!";
+                }
+                else {
+                    document.getElementById("success").textContent = "";
+                }
+            });
+
+    </script>
+
+</body>
+
+</html>
