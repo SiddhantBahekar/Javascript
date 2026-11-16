@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>String and Regex Analyzer</title>
+</head>
+<body>
+
+    <h2>String and Regex Analyzer</h2>
+
+    <input type="text" id="email"
+           placeholder="Enter Email Address">
+
+    <br><br>
+
+    <textarea id="text"
+              placeholder="Enter text with numbers"></textarea>
+
+    <br><br>
+
+    <button onclick="analyzeText()">Analyze</button>
+
+    <p id="result">Results will appear here.</p>
+
+    <script>
+        function analyzeText() {
+
+            let email = document.getElementById("email").value.trim();
+            let text = document.getElementById("text").value.trim();
+
+            // Email validation using Regex
+            let emailPattern =
+            /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+
+            let emailStatus = emailPattern.test(email)
+                ? "Valid Email"
+                : "Invalid Email";
+
+            // String functions
+            let upper = text.toUpperCase();
+            let lower = text.toLowerCase();
+            let characters = text.length;
+
+            let words = text === "" ? 0 : text.split(/\s+/).length;
+
+            // Extract numbers using Regex
+            let numbers = text.match(/\d+/g);
+
+            // Display results
+            document.getElementById("result").innerHTML =
+                "<b>Email:</b> " + emailStatus + "<br>" +
+                "<b>Characters:</b> " + characters + "<br>" +
+                "<b>Words:</b> " + words + "<br>" +
+                "<b>Uppercase:</b> " + upper + "<br>" +
+                "<b>Lowercase:</b> " + lower + "<br>" +
+                "<b>Numbers:</b> " +
+                (numbers ? numbers.join(", ") : "No Numbers Found");
+        }
+    </script>
+
+</body>
+</html>
