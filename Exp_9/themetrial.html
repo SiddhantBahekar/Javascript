@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Theme Preferences</title>
+</head>
+
+<body>
+
+    <h2>Theme Preference</h2>
+
+    <p>Select your preferred theme.</p>
+
+    <button onclick="setDarkTheme()">Dark Theme</button>
+    <button onclick="setLightTheme()">Light Theme</button>
+    <button onclick="clearStorage()">Clear Preferences</button>
+
+    <p id="status"></p>
+
+    <script>
+
+        // Load saved theme and count visits
+        window.onload = function () {
+
+            let theme = localStorage.getItem("theme");
+
+            if (theme === "dark") {
+                document.body.style.backgroundColor = "black";
+                document.body.style.color = "white";
+            }
+
+            // Count visits using sessionStorage
+            let visits = sessionStorage.getItem("visits");
+
+            if (visits === null) {
+                visits = 1;
+            }
+            else {
+                visits = Number(visits) + 1;
+            }
+
+            sessionStorage.setItem("visits", visits);
+
+            document.getElementById("status").innerHTML =
+                "Session Visits: " + visits;
+        };
+
+        // Save dark theme
+        function setDarkTheme() {
+
+            document.body.style.backgroundColor = "black";
+            document.body.style.color = "white";
+
+            localStorage.setItem("theme", "dark");
+
+            document.getElementById("status").innerHTML =
+                "Dark Theme Saved";
+        }
+
+        // Save light theme
+        function setLightTheme() {
+
+            document.body.style.backgroundColor = "white";
+            document.body.style.color = "black";
+
+            localStorage.setItem("theme", "light");
+
+            document.getElementById("status").innerHTML =
+                "Light Theme Saved";
+        }
+
+        // Clear storage
+        function clearStorage() {
+
+            localStorage.clear();
+            sessionStorage.clear();
+
+            document.body.style.backgroundColor = "white";
+            document.body.style.color = "black";
+
+            document.getElementById("status").innerHTML =
+                "Preferences Cleared";
+        }
+
+    </script>
+
+</body>
+
+</html>
