@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Palindrome Checker</title>
+</head>
+
+<body>
+
+    <h2>Palindrome Checker</h2>
+
+    <input type="text" id="word" placeholder="Enter a word">
+
+    <button onclick="checkPalindrome()">Check</button>
+
+    <p id="result"></p>
+
+    <script>
+
+        // Closure
+        function counter() {
+            let count = 0;
+
+            return function () {
+                return ++count;
+            };
+        }
+
+        let visit = counter();
+
+        // Function Declaration
+        function checkPalindrome() {
+
+            try {
+
+                let word = document.getElementById("word").value;
+
+                if (word.trim() === "") {
+                    throw "Please enter a word";
+                }
+
+                // Scope
+                let original = word.toLowerCase();
+
+                // Arrow Function
+                let reverse = str => str.split("").reverse().join("");
+
+                let reversed = reverse(original);
+
+                // Function Expression
+                let check = function (a, b) {
+                    return a === b;
+                };
+
+                let message = check(original, reversed)
+                    ? "Palindrome"
+                    : "Not a Palindrome";
+
+                document.getElementById("result").innerHTML =
+                    "Original: " + word + "<br>" +
+                    "Reversed: " + reversed + "<br>" +
+                    "Result: " + message + "<br>" +
+                    "Count: " + visit();
+
+            }
+            catch (error) {
+                alert(error);
+            }
+        }
+
+    </script>
+
+</body>
+
+</html>
