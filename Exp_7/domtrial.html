@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>To-Do List</title>
+</head>
+
+<body>
+
+    <h2>To-Do List App</h2>
+
+    <input type="text" id="taskInput" placeholder="Enter a task">
+    <button onclick="addTask()">Add</button>
+
+    <ul id="taskList"></ul>
+
+    <p>Total Tasks: <span id="count">0</span></p>
+
+    <script>
+
+        // Update task count
+        function updateCount() {
+            let list = document.getElementById("taskList");
+            document.getElementById("count").textContent =
+                list.children.length;
+        }
+
+        // Add task
+        function addTask() {
+
+            let input = document.getElementById("taskInput");
+            let task = input.value.trim();
+
+            if (task === "") {
+                alert("Please enter a task.");
+                return;
+            }
+
+            let li = document.createElement("li");
+
+            // Create task text
+            let span = document.createElement("span");
+            span.textContent = task;
+
+            // Create Edit button
+            let editBtn = document.createElement("button");
+            editBtn.textContent = "Edit";
+            editBtn.onclick = function () {
+                editTask(this);
+            };
+
+            // Create Delete button
+            let deleteBtn = document.createElement("button");
+            deleteBtn.textContent = "Delete";
+            deleteBtn.onclick = function () {
+                deleteTask(this);
+            };
+
+            li.appendChild(span);
+            li.appendChild(editBtn);
+            li.appendChild(deleteBtn);
+
+            document.getElementById("taskList").appendChild(li);
+
+            input.value = "";
+            updateCount();
+        }
+
+        // Edit task
+        function editTask(button) {
+
+            let li = button.parentElement;
+            let span = li.querySelector("span");
+
+            let updated = prompt("Edit Task", span.textContent);
+
+            if (updated !== null && updated.trim() !== "") {
+                span.textContent = updated.trim();
+            }
+        }
+
+        // Delete task
+        function deleteTask(button) {
+
+            let li = button.parentElement;
+            li.remove();
+
+            updateCount();
+        }
+
+    </script>
+
+</body>
+
+</html>
