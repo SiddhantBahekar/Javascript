@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Student Grading System</title>
+</head>
+
+<body>
+
+    <h2>Student Grading System</h2>
+
+    Enter Student Name:
+    <input type="text" id="name">
+    <br><br>
+
+    Enter Marks:
+    <input type="number" id="marks">
+    <br><br>
+
+    <button onclick="calculateGrade()">
+        Calculate Grade
+    </button>
+
+    <p id="result"></p>
+
+    <script>
+        function calculateGrade() {
+
+            let name = document.getElementById("name").value.trim();
+            let marks = document.getElementById("marks").value;
+
+            // Form Validation
+            if (name == "") {
+                alert("Enter student name");
+                return;
+            }
+
+            if (marks == "") {
+                alert("Enter marks");
+                return;
+            }
+
+            marks = Number(marks);
+
+            if (marks < 0 || marks > 100) {
+                alert("Enter marks between 0 and 100");
+                return;
+            }
+
+            // Grade Calculation
+            let grade;
+
+            if (marks >= 90) {
+                grade = "A+";
+            }
+            else if (marks >= 80) {
+                grade = "A";
+            }
+            else if (marks >= 70) {
+                grade = "B";
+            }
+            else if (marks >= 60) {
+                grade = "C";
+            }
+            else if (marks >= 50) {
+                grade = "D";
+            }
+            else {
+                grade = "F";
+            }
+
+            // Ternary Operator
+            let status = (marks >= 50) ? "Pass" : "Fail";
+
+            // Display Result
+            document.getElementById("result").innerHTML =
+                "Name: " + name + "<br>" +
+                "Marks: " + marks + "<br>" +
+                "Grade: " + grade + "<br>" +
+                "Result: " + status;
+        }
+    </script>
+
+</body>
+
+</html>
